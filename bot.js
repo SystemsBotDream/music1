@@ -27,91 +27,91 @@ var adminprefix = '4'
 
  client.on('message', async msg => {
     if (msg.author.bot) return undefined;
-    if (!msg.content.startsWith(prefix)) return undefined;///// DgPro
+    if (!msg.content.startsWith(prefix)) return undefined;
     const args = msg.content.split(' ');
-    const searchString = args.slice(1).join(' ');///// DgPro
+    const searchString = args.slice(1).join(' ');
     const url = args[1] ? args[1] .replace(/<(.+)>/g, '$1') : '';
-    const serverQueue = queue.get(msg.guild.id);///// DgPro
-    let command = msg.content.toLowerCase().split(" ")[0];///// DgPro
+    const serverQueue = queue.get(msg.guild.id);
+    let command = msg.content.toLowerCase().split(" ")[0];
     command = command.slice(prefix.length)
     if (command === `play`) {
         const voiceChannel = msg.member.voiceChannel;
         if (!voiceChannel) return msg.channel.send('يجب تواجدك بروم صوتي | :x:');
-        const permissions = voiceChannel.permissionsFor(msg.client.user);///// DgPro
-        if (!permissions.has('CONNECT')) {///// DgPro
-            return msg.channel.send('يجب اعطاء البوت صلاحيه لدخول الروم | :x:');///// DgPro
+        const permissions = voiceChannel.permissionsFor(msg.client.user);
+        if (!permissions.has('CONNECT')) {
+            return msg.channel.send('يجب اعطاء البوت صلاحيه لدخول الروم | :x:');
         }
-        if (!permissions.has('SPEAK')) {///// DgPro
-            return msg.channel.send('يجب اعطاء البوت صلاحيه للتكلم بلروم | :x:');///// DgPro
+        if (!permissions.has('SPEAK')) {
+            return msg.channel.send('يجب اعطاء البوت صلاحيه للتكلم بلروم | :x:');
         }
  
-        if (!permissions.has('EMBED_LINKS')) {///// DgPro
+        if (!permissions.has('EMBED_LINKS')) {
             return msg.channel.sendMessage("**يجب اعطاء البوت صلاحيه ``EMBED_LINKS`` | :x:**")
             }
  
         if (url.match(/^https?:\/\/(www.youtube.com|youtube.com)\/playlist(.*)$/)) {
             const playlist = await youtube.getPlaylist(url);
             const videos = await playlist.getVideos();
-            for (const video of Object.values(videos)) {///// DgPro
+            for (const video of Object.values(videos)) {
                 const video2 = await youtube.getVideoByID(video.id);
                 await handleVideo(video2, msg, voiceChannel, true);
             }
             return msg.channel.send(`**${playlist.title}**الي قائمه التشغيل Play List تم اضافه ال  | :white_check_mark:`);
-        } else {///// DgPro
+        } else {
             try {
  
-                var video = await youtube.getVideo(url);///// DgPro
+                var video = await youtube.getVideo(url);
  
             } catch (error) {
-                try {///// DgPro
+                try {
                                             var fast = {};
                     var videos = await youtube.searchVideos(searchString, 10);
                     let index = 0;
                     const embed1 = new Discord.RichEmbed()
                     .setDescription(`**يرجا كتابه رقم المقطع | :1234:** :
-${videos.map(video2 => `[**${++index}**] **${video2.title}**`).join('\n')}`)///// DgPro
+${videos.map(video2 => `[**${++index}**] **${video2.title}**`).join('\n')}`)
     .setFooter(`Requested by | ${msg.author.tag}`);
                     msg.channel.sendEmbed(embed1).then(message =>{
  
-                        message.delete(15000)///// DgPro
+                        message.delete(15000)
  
                     });
-                    try {///// DgPro
+                    try {
                         var response = await msg.channel.awaitMessages(msg2 => msg2.content > 0 && msg2.content < 11, {
                             maxMatches: 1,
-                            time: 20000,///// DgPro
+                            time: 20000,
                             errors: ['time']
-                        })///// DgPro
+                        })
  
-                        }catch(err) {///// DgPro
+                        }catch(err) {
                         console.error(err);
                         return msg.channel.send('**لم يتم اختيار رقم | :x:**');
-                        }///// DgPro
+                        }
                     const videoIndex = parseInt(response.first().content);
                     var video = await youtube.getVideoByID(videos[videoIndex - 1].id);
                 } catch (err) {
-                    console.error(err);///// DgPro
+                    console.error(err);
                     return msg.channel.send('**لا يتوفر نتائج بحث | :x:**');
-                }///// DgPro
+                }
         }
  
-            return handleVideo(video, msg, voiceChannel);///// DgPro
+            return handleVideo(video, msg, voiceChannel);
         }
     } else if (command === `skip`) {
-        if (!msg.member.voiceChannel) return msg.channel.send('يجب تواجدك بروم صوتي | :x:');///// DgPro
-        if (!serverQueue) return msg.channel.send('**يجب تشغيل مقطع لطغطيه | :x:**');///// DgPro
-        serverQueue.connection.dispatcher.end('**تم بنجاح | :white_check_mark:**');///// DgPro
+        if (!msg.member.voiceChannel) return msg.channel.send('انت لست في روم صوتي | :x:');
+        if (!serverQueue) return msg.channel.send('**يجب تشغيل مقطع لتخطيه | :x:**');
+        serverQueue.connection.dispatcher.end('**تم بنجاح | :white_check_mark:**');
         return undefined;
     } else if (command === `stop`) {
         if (!msg.member.voiceChannel) return msg.channel.send('أنت لست بروم صوتي .');
-        if (!serverQueue) return msg.channel.send('لا يتوفر مقطع لإيقآفه');///// DgPro
+        if (!serverQueue) return msg.channel.send('لا يتوفر مقطع لإيقآفه');
         serverQueue.songs = [];
         serverQueue.connection.dispatcher.end('تم إيقآف هذآ المقطع');
-        return undefined;///// DgPro///// DgPro///// DgPro
+        return undefined;
     } else if (command === `vol`) {
-        if (!msg.member.voiceChannel) return msg.channel.send('أنت لست بروم صوتي .');///// DgPro
-        if (!serverQueue) return msg.channel.send('**يجب اختيار مقطع لي تغيير حجم صوته | :x:**');///// DgPro
-        if (!args[1]) return msg.channel.send(`**__${serverQueue.volume}__ مستوي الصوت الحالي هو | :loud_sound:**`);///// DgPro
+        if (!msg.member.voiceChannel) return msg.channel.send('أنت لست بروم صوتي .');
+        if (!serverQueue) return msg.channel.send('**يجب اختيار مقطع لي تغيير حجم صوته | :x:**');
+        if (!args[1]) return msg.channel.send(`**__${serverQueue.volume}__ مستوي الصوت الحالي هو | :loud_sound:**`);
         serverQueue.volume = args[1];
         serverQueue.connection.dispatcher.setVolumeLogarithmic(args[1] / 50);
         return msg.channel.send(`**__${args[1]}__ تم تغيير مستوي الصوت الي | :loud_sound:**`);
@@ -119,29 +119,29 @@ ${videos.map(video2 => `[**${++index}**] **${video2.title}**`).join('\n')}`)////
         if (!serverQueue) return msg.channel.send('لا يوجد شيء حالي ف العمل.');
         const embedNP = new Discord.RichEmbed()
     .setDescription(`:notes: الان يتم تشغيل : **${serverQueue.songs[0].title}**`)
-        return msg.channel.sendEmbed(embedNP);///// DgPro
+        return msg.channel.sendEmbed(embedNP);
     } else if (command === `replay`) {
-        if (!serverQueue) return msg.channel.send('لا يوجد شيء حالي ف العمل.');///// DgPro
+        if (!serverQueue) return msg.channel.send('لا يوجد شيء حالي ف العمل.');
         const embedNP = new Discord.RichEmbed()
     .setDescription(`سيتم اعاده تشغيل الفديو :**${serverQueue.songs[0].title}**`)
     msg.channel.send({embed: embedNP})
-     return handleVideo(video, msg, msg.member.voiceChannel);///// DgPro
+     return handleVideo(video, msg, msg.member.voiceChannel);
  
     } else if (command === `queue`) {
         if (!serverQueue) return msg.channel.send('لا يوجد شيء حالي ف العمل.');
         let index = 0;
-        const embedqu = new Discord.RichEmbed()///// DgPro
+        const embedqu = new Discord.RichEmbed()
 .setDescription(`**Songs Queue**
 ${serverQueue.songs.map(song => `**${++index} -** ${song.title}`).join('\n')}
 **الان يتم تشغيل** ${serverQueue.songs[0].title}`)
         return msg.channel.sendEmbed(embedqu);
     } else if (command === `pause`) {
-        if (serverQueue && serverQueue.playing) {///// DgPro
+        if (serverQueue && serverQueue.playing) {
             serverQueue.playing = false;
             serverQueue.connection.dispatcher.pause();
-            return msg.channel.send('تم إيقاف الموسيقى مؤقتا!');///// DgPro
+            return msg.channel.send('تم إيقاف الموسيقى مؤقتا!');
         }
-        return msg.channel.send('لا يوجد شيء حالي ف العمل.');///// DgPro
+        return msg.channel.send('لا يوجد شيء حالي ف العمل.');
     } else if (command === "resume") {
         if (serverQueue && !serverQueue.playing) {
             serverQueue.playing = true;
@@ -152,39 +152,39 @@ ${serverQueue.songs.map(song => `**${++index} -** ${song.title}`).join('\n')}
     }
  
     return undefined;
-async function handleVideo(video, msg, voiceChannel, playlist = false) {///// DgPro
+async function handleVideo(video, msg, voiceChannel, playlist = false) {
     const serverQueue = queue.get(msg.guild.id);
-    const song = {///// DgPro
+    const song = {
         id: video.id,
         title: Util.escapeMarkdown(video.title),
-        url: `https://www.youtube.com/watch?v=${video.id}`,///// DgPro
+        url: `https://www.youtube.com/watch?v=${video.id}`,
         time:`${video.duration.hours}:${video.duration.minutes}:${video.duration.seconds}`,
         eyad:`${video.thumbnails.high.url}`,
         best:`${video.channel.title}`,
-        bees:`${video.raw.snippet.publishedAt}`,///// DgPro
+        bees:`${video.raw.snippet.publishedAt}`,
         shahd:`${video.raw.kind}`,
         zg:`${video.raw.snippet.channelId}`,
-        views:`${video.raw.views}`,///// DgPro
+        views:`${video.raw.views}`,
         like:`${video.raw.likeCount}`,
         dislike:`${video.raw.dislikeCount}`,
         hi:`${video.raw.id}`
     };
     if (!serverQueue) {
-        const queueConstruct = {///// DgPro
+        const queueConstruct = {
             textChannel: msg.channel,
             voiceChannel: voiceChannel,
             connection: null,
             songs: [],
-            volume: 5,///// DgPro
+            volume: 5,
             playing: true
         };
-        queue.set(msg.guild.id, queueConstruct);///// DgPro
+        queue.set(msg.guild.id, queueConstruct);
         queueConstruct.songs.push(song);
         try {
             var connection = await voiceChannel.join();
-            queueConstruct.connection = connection;///// DgPro
+            queueConstruct.connection = connection;
             play(msg.guild, queueConstruct.songs[0]);
-        } catch (error) {///// DgPro
+        } catch (error) {
             console.error(`I could not join the voice channel: ${error}`);
             queue.delete(msg.guild.id);
             return msg.channel.send(`لا أستطيع دخول هذآ الروم ${error}`);
@@ -199,13 +199,12 @@ async function handleVideo(video, msg, voiceChannel, playlist = false) {///// Dg
 }
  
 function play(guild, song) {
-    const serverQueue = queue.get(guild.id);///// DgPro
- ///// DgPro
+    const serverQueue = queue.get(guild.id);
     if (!song) {
-        serverQueue.voiceChannel.leave();///// DgPro
+        serverQueue.voiceChannel.leave();
         queue.delete(guild.id);
         return;
-    }///// DgPro
+    }
     console.log(serverQueue.songs);
     const dispatcher = serverQueue.connection.playStream(ytdl(song.url))
         .on('end', reason => {
@@ -213,7 +212,7 @@ function play(guild, song) {
             else console.log(reason);
             serverQueue.songs.shift();
             play(guild, serverQueue.songs[0]);
-        })///// DgPro
+        })
         .on('error', error => console.error(error));
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
         fetchVideoInfo(`${song.hi}`, function (err, fuck) {
@@ -264,16 +263,16 @@ function play(guild, song) {
   .addField('لايكات👍 :' , `${yyyy[msg.guild.id].like}`, true)
   .addField('ديس لايكات👎 :' , `${fuck.dislikeCount}`, true)
   .addField('عدد الكومنتات :' , `${fuck.commentCount}`, true)
-    .setImage(`${song.eyad}`)///// DgPro
-    .setThumbnail('http://cdn.akhbaar24.com/430e061a-f89a-43c7-86d9-82fae5f7c495.jpg')
+    .setImage(`${song.eyad}`)
+    .setThumbnail('https://cdn.discordapp.com/attachments/529627715738009602/531387092207534080/530002783999361064.png')
     .setColor('#ff0000')
-    .setTimestamp()///// DgPro
+    .setTimestamp()
 });
-    })///// DgPro
+    })
  
     dd.on("collect", r => {
       yyyy[msg.guild.id].dislike++;
-    love.edit({embed : new Discord.RichEmbed()///// DgPro
+    love.edit({embed : new Discord.RichEmbed()
   .setTitle(`**${fuck.title}**`)
   .setURL(fuck.url)
   .addField('وقت الفيديو :' , `${song.time}`, true)
@@ -281,29 +280,29 @@ function play(guild, song) {
   .addField('معرف القناه :' , `${song.zg}`, true)
   .addField('الفيديو صنع في :' , `${fuck.datePublished}`, true)
   .addField('مشاهدات :' , `${fuck.views}`, true)
-  .addField('لايكات 👍 :' , `${fuck.likeCount}`, true)///// DgPro
+  .addField('لايكات 👍 :' , `${fuck.likeCount}`, true)
   .addField('ديس لايكات 👎 :' , `${yyyy[msg.guild.id].dislike}`, true)
   .addField('عدد الكومنتات :' , `${fuck.commentCount}`, true)
     .setImage(`${song.eyad}`)
     .setThumbnail('http://cdn.akhbaar24.com/430e061a-f89a-43c7-86d9-82fae5f7c495.jpg')
     .setColor('#ff0000')
-    .setTimestamp()///// DgPro
+    .setTimestamp()
 });
 })
     cn.on("collect", r => {
     love.edit({embed : new Discord.RichEmbed()
   .setTitle(`**${fuck.title}**`)
   .setURL(fuck.url)
-  .addField('وقت الفيديو :' , `${song.time}`, true)///// DgPro
-  .addField('اسم القناه :' , `${song.best}`, true)///// DgPro
-  .addField('معرف القناه :' , `${song.zg}`, true)///// DgPro
+  .addField('وقت الفيديو :' , `${song.time}`, true)
+  .addField('اسم القناه :' , `${song.best}`, true)
+  .addField('معرف القناه :' , `${song.zg}`, true)
   .addField('الفيديو صنع في :' , `${fuck.datePublished}`, true)
-  .addField('عدد المشاهدات :' , `${fuck.views}`, true)///// DgPro
-  .addField('لايكات 👍 :' , `${fuck.likeCount}`, true)///// DgPro
-  .addField('ديس لايكات 👎 :' , `${fuck.dislikeCount}`, true)///// DgPro
-  .addField('عدد الكومينتات :' , `${fuck.commentCount}`, true)///// DgPro
-    .setImage(`${song.eyad}`)///// DgPro
-    .setThumbnail('http://cdn.akhbaar24.com/430e061a-f89a-43c7-86d9-82fae5f7c495.jpg')///// DgPro
+  .addField('عدد المشاهدات :' , `${fuck.views}`, true)
+  .addField('لايكات 👍 :' , `${fuck.likeCount}`, true)
+  .addField('ديس لايكات 👎 :' , `${fuck.dislikeCount}`, true)
+  .addField('عدد الكومينتات :' , `${fuck.commentCount}`, true)
+    .setImage(`${song.eyad}`)
+    .setThumbnail('https://cdn.discordapp.com/attachments/529627715738009602/531387092207534080/530002783999361064.png')
     .setColor('#ff0000')
     .setTimestamp()
 });
