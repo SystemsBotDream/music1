@@ -316,7 +316,7 @@ function play(guild, song) {
 }
 })
 
-const developers = ["472413769700474901","id"]
+const developers = ["496585065673916417","id"]
 client.on('message', message => {
     var argresult = message.content.split(` `).slice(1).join(' ');
       if (!developers.includes(message.author.id)) return;
